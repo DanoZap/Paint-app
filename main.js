@@ -1,17 +1,30 @@
 const canvas = document.querySelector("canvas"),
 toolBtns = document.querySelectorAll(".tool"),
-fillColor = document.querySelector("#fill-color")
+fillColor = document.querySelector("#fill-color"),
+sizeSlider = document.querySelector("#size-slider"),
+colorsBtns = document.querySelectorAll(".colors .option"),
+colorPicker = document.querySelector("#color-picker"),
+clearCanvas = document.querySelector(".clear-canvas"),
+saveImg = document.querySelector(".save-img"),
 ctx = canvas.getContext("2d");
 
 // Global variables with Default values
 let prevMouseX, prevMouseY, snapshot,
 isDrawing,
 selectedTool = "brush",
-brushWidth = 5
+brushWidth = 5,
+selectedColor = "000";
+
+const canvasBackground = () => {
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = selectedColor;
+}
 
 window.addEventListener("load", () => {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+    canvasBackground(); 
 })
 
 const drawRect = (e) => {
@@ -42,7 +55,7 @@ const drawTriangle = (e) => {
     ctx.lineTo(e.offsetX, e.offsetY); // draw first line
     ctx.lineTo(prevMouseX * 2 - e.offsetX, e.offsetY); // bottom line of triangle
     ctx.closePath(); //closing patch of a triangle so the third line draw automatically
-    fillColor.checked ?ctx.fill() : ctx.stroke(); // fill color
+    fillColor.checked ? ctx.fill() : ctx.stroke(); // fill color
 }
 
 const starDraw = (e) => {
@@ -51,8 +64,11 @@ const starDraw = (e) => {
     prevMouseY = e.offsetY;
     ctx.beginPath() //create new path to draw
     ctx.lineWidth = brushWidth; // line width
+    ctx.strokeStyle = selectedColor;
+    ctx.fillStyle = selectedColor;
     snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
+
 const stopDraw = () => {
     isDrawing = false;
 }
@@ -61,7 +77,8 @@ const drawing = (e) => {
     if(!isDrawing) return;
     ctx.putImageData(snapshot, 0, 0);
 
-    if(selectedTool === "brush") {
+    if(selectedTool === "brush" || selectedTool === "eraser") {
+        ctx.strokeStyle = selectedTool === "eraser" ? "#fff" : selectedColor;
         ctx.lineTo(e.offsetX, e.offsetY); //Create line according to mouse
         ctx.stroke(); //draw line with color
     } else if (selectedTool === "rectangle") {
@@ -82,6 +99,33 @@ toolBtns.forEach(btn => {
         console.log(selectedTool)
     })
 })
+
+sizeSlider.addEventListener("change", () => brushWidth = sizeSlider.value);
+
+colorsBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+        document.querySelector(".options .selected").classList.remove("selected");
+        btn.classList.add("selected");
+        selectedColor = window.getComputedStyle(btn).getPropertyValue("background-color");        
+    })
+});
+
+colorPicker.addEventListener("change", () => {
+    colorPicker.parentElement.style.background = colorPicker.value;
+    colorPicker.parentElement.click();
+});
+
+clearCanvas.addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+saveImg.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = `${Date.now()}.jpg`;
+    link.href = canvas.toDataURL();
+    link.click();
+});
+
 
 canvas.addEventListener("mousedown", starDraw);
 canvas.addEventListener("mouseup", stopDraw);

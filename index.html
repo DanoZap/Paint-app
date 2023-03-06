@@ -51,6 +51,9 @@
                         <input 
                         type="range" 
                         id="size-slider"
+                        min="0"
+                        max="30"
+                        value="5"
                         />
                     </li>
                 </ul>
@@ -62,8 +65,7 @@
                     <li class="option selected"></li>
                     <li class="option"></li>
                     <li class="option"></li>
-                    <li class="option"></li>
-                    <input type="color" id="color-picker" value="#4A98F7">
+                    <li class="option"><input type="color" id="color-picker" value="#4A98F7"></li>                    
                 </ul>
             </div>
             <div class="row buttons">
@@ -72,7 +74,8 @@
                     <button class="clear-canvas">Clear Canvas</button>
                     <button class="save-img">Save as Image</button>
                 </ul>
-            </div>
+            </div>            
+            <p class="myself">By: Daniel Zapata</p>
         </section>
         <section class="drawing-board">
             <canvas></canvas>
